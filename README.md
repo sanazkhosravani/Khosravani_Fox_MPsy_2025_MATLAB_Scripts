@@ -59,5 +59,5 @@ To reproduce our analyses, the following software packages are required:
 - 5_Code_for_Generating_Figure3: Generating Manuscript Plots
 - 6_Analysis_of_Spatial_Topography: Analysis of the Spatial Topography of the Depression Improvement Network Before and After Incorporating Clinical Covariates
 
-As an analogous normative connectome to the one used in this study, researchers may consider using the GSP connectome, which is openly accessible:
-Cohen, A., Soussand, L., McManus, P., & Fox, M. (2020). GSP1000 preprocessed connectome. Harvard Dataverse. https://doi.org/10.7910/DVN/ILXIKS
+As an analogous normative connectome to the one used in this study, researchers may consider using the GSP connectome, which is openly accessible and can be downloaded from Harvard Dataverse. This dataset offers a preprocessed connectome that can be used for comparison and analysis in studies related to brain network analysis.
+Reference: Cohen, A., Soussand, L., McManus, P., & Fox, M. (2020). GSP1000 preprocessed connectome. Harvard Dataverse. https://doi.org/10.7910/DVN/ILXIKS
