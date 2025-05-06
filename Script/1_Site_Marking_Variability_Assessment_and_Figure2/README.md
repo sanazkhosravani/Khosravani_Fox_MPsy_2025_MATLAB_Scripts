@@ -15,7 +15,8 @@ This repository contains MATLAB scripts for analyzing within- and between-subjec
   - Finds the 3D point equidistant to three given site markings (circumcenter)
 
 ### 3. `3_VisualizeEquidistantPoint.mlx`
-- **Purpose**: Visualization of the equidistant point relative to the 3 input data points.
+- **Functionality**:
+  - Visualization of the equidistant point relative to the 3 input data points.
 
 ### 4. `4_Variability_Site_Markings.mlx`
 - **Purpose**: Statistical analysis of within- vs. between-individual TMS site variability data
