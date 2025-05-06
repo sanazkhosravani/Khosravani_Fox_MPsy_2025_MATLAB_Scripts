@@ -7,41 +7,34 @@ This repository contains MATLAB scripts for analyzing within- and between-subjec
 ### 1. `1_Example_Input_Data.mlx`
 - **Purpose**: Calculates Euclidean distance-based variability metrics
 - **Functionality**:
-  - Computes within-subject variability (distance to subject-specific centroid)
-  - Computes between-subject variability (distance to group centroid)
-  - Handles multiple site markings per subject
-- **Output**: Distance measurements for further statistical analysis
+  - Computes within-subject variability input data (distance to subject-specific centroid)
+  - Computes between-subject variability input data (distance to group centroid)
 
-### 2. `2_Variability_Site_Markings.mlx`
-- **Purpose**: Statistical analysis of variability patterns
+### 2. `2_Find_Equidistant_Point.mlx`
+- **Functionality**:
+  - Finds the 3D point equidistant to three given site markings (circumcenter)
+
+### 3. `3_VisualizeEquidistantPoint.mlx`
+- **Purpose**: Visualization of the equidistant point relative to the 3 input data points.
+
+### 4. `4_Variability_Site_Markings.mlx`
+- **Purpose**: Statistical analysis of within- vs. between-individual TMS site variability data
 - **Functionality**:
   - Linear mixed-effects modeling (accounting for repeated measures)
   - Confidence interval estimation (parametric and bootstrap methods)
-  - Comparison across hospital sites
 - **Output**: Model results, ANOVA tables, and effect size estimates
 
-### 3. `3_Find_Equidistant_Point.mlx`
-- **Purpose**: Geometric calculation for alternative variability assessment
-- **Functionality**:
-  - Finds the 3D point equidistant to three given site markings (circumcenter)
-  - Uses perpendicular bisector planes and geometric constraints
-  - Includes solution verification
-- **Output**: Equidistant point coordinates for subjects with ≥3 markings
-
-### 4. `4_Plot_Variability_Site_Markings_Within_versus_Between.mlx`
+### 5. `5_Plot_Variability_Site_Markings_Within_versus_Between.mlx`
 - **Purpose**: Graphical representation of variability patterns
 - **Functionality**:
   - Jittered scatter plots of individual measurements
   - Mean values with 95% confidence intervals
-  - Statistical comparison annotations
-  - Publication-quality figure formatting
-- **Output**: Ready-to-use visualization of within vs. between-subject variability
 
 ## Typical Workflow
 1. Process coordinates with `1_Example_Input_Data.mlx`
-2. For subjects with ≥3 markings, optionally use `3_Find_Equidistant_Point.mlx`
-3. Analyze results with `2_Variability_Site_Markings.mlx`
-4. Visualize findings with `4_Plot_Variability_Site_Markings_Within_versus_Between.mlx`
+2. For subjects with ≥3 markings, optionally use `2_Find_Equidistant_Point.mlx` and visualize the estimated location using `3_VisualizeEquidistantPoint.mlx`
+3. Analyze results with `4_Variability_Site_Markings.mlx`
+4. Visualize findings with `5_Plot_Variability_Site_Markings_Within_versus_Between.mlx`
 
 ## Requirements
 - MATLAB (tested on R2020b or later)
