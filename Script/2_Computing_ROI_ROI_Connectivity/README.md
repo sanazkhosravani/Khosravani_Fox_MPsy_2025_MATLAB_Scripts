@@ -36,12 +36,6 @@ The analysis pipeline:
 - `conn_indiv`: Matrix of TMS-SGC connectivity values (rows = TMS models, columns = subjects)
 - Group average connectivity for each TMS model across all subjects
 
-## Usage
-
-1. Edit subject list in `SUBJ_Inclusive`
-2. Ensure all input files are in correct paths
-3. Run script in MATLAB
-
 ## Dependencies
 
 - `load_nii` (for NIfTI file handling)
