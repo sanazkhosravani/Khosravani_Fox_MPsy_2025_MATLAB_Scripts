@@ -28,13 +28,13 @@ This repository contains MATLAB scripts for analyzing within- and between-subjec
 ### 5. `5_Plot_Variability_Site_Markings_Within_versus_Between.mlx`
 - **Purpose**: Graphical representation of variability patterns
 - **Functionality**:
-  - Jittered scatter plots of individual measurements
+  - Jittered scatter plots of within- versus between-subject variability data
   - Mean values with 95% confidence intervals
 
 ## Typical Workflow
 1. Process coordinates with `1_Example_Input_Data.mlx`
 2. For subjects with ≥3 markings, optionally use `2_Find_Equidistant_Point.mlx` and visualize the estimated location using `3_VisualizeEquidistantPoint.mlx`
-3. Analyze results with `4_Variability_Site_Markings.mlx`
+3. Contrast within- versus between-subject variability data using `4_Variability_Site_Markings.mlx`
 4. Visualize findings with `5_Plot_Variability_Site_Markings_Within_versus_Between.mlx`
 
 ## Requirements
