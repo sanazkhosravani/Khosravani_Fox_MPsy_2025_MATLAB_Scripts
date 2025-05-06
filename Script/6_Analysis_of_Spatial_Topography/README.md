@@ -23,5 +23,5 @@ Siddiqi, S. H., Schaper, F. L. W. V. J., Horn, A., Hsu, J., Brodtmann, A., Cash,
 - SPM 12
 
 ## Expected Outputs
-- `depression_correlation_map.nii`: Statistical map of symptom correlations
+- `depression_correlation_map.nii`: Data-driven map of correlation coefficients demonstrating the relationship between functional connectivity of each voxel to TMS site and antidepressant response.
 - Spatial correlation with reference maps (when provided)
