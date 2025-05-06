@@ -4,11 +4,14 @@ MATLAB pipeline for computing resting-state functional connectivity between:
 1. Subject-specific TMS field distribution models
 2. Subgenual cingulate (SGC) mask
 
-This code provides an example of how to compute ROI-to-ROI functional connectivity between a TMS field distribution model and an SGC mask. While the example illustrates the methodology, the connectivity values reported in the manuscript were computed using the Yeo connectome. As an alternative normative connectome, you may use the GSP1000 connectome.
+This code provides an example of how to compute ROI-to-ROI functional connectivity between a TMS field distribution model and an SGC mask. While the example illustrates the methodology, the connectivity values reported in the manuscript were computed using a normative connectome (Yeo et al., 2011). As an analogous normative connectome to the one used in this study, you may use the GSP1000 connectome (Cohen et al., 2020).
 
 ## References
-- Yeo Connectome: Yeo et al. (2011) *The organization of the human cerebral cortex estimated by intrinsic functional connectivity* [J Neurophysiol](https://doi.org/10.1152/jn.00338.2011)
-- GSP1000 Connectome: Holmes et al. (2015) *Brain Genomics Superstruct Project* [Sci Data](https://doi.org/10.1038/sdata.2015.31)
+
+1. Yeo, B. T. T., Krienen, F. M., Sepulcre, J., Sabuncu, M. R., Lashkari, D., Hollinshead, M., ... & Buckner, R. L. (2011). The organization of the human cerebral cortex estimated by intrinsic functional connectivity. *Journal of Neurophysiology, 106*(3), 1125–1165. [https://doi.org/10.1152/jn.00338.2011](https://doi.org/10.1152/jn.00338.2011)
+2. Cohen, A., Soussand, L., McManus, P., & Fox, M. (2020). *GSP1000 preprocessed connectome* \[Dataset]. Harvard Dataverse. [https://doi.org/10.7910/DVN/ILXIKS](https://doi.org/10.7910/DVN/ILXIKS)
+
+
 
 ## Analysis Overview
 ```mermaid
