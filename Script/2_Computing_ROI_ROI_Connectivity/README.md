@@ -11,19 +11,6 @@ This code provides an example of how to compute ROI-to-ROI functional connectivi
 1. Yeo, B. T. T., Krienen, F. M., Sepulcre, J., Sabuncu, M. R., Lashkari, D., Hollinshead, M., ... & Buckner, R. L. (2011). The organization of the human cerebral cortex estimated by intrinsic functional connectivity. *Journal of Neurophysiology, 106*(3), 1125–1165. [https://doi.org/10.1152/jn.00338.2011](https://doi.org/10.1152/jn.00338.2011)
 2. Cohen, A., Soussand, L., McManus, P., & Fox, M. (2020). *GSP1000 preprocessed connectome* \[Dataset]. Harvard Dataverse. [https://doi.org/10.7910/DVN/ILXIKS](https://doi.org/10.7910/DVN/ILXIKS)
 
-
-
-## Analysis Overview
-```mermaid
-graph TD
-    A[Load TMS Field Model] --> B[Apply MNI Mask]
-    C[Load fMRI Timecourses] --> D[Extract TMS ROI Signal]
-    E[Load SGC Mask] --> F[Extract SGC Signal]
-    B --> D
-    D --> G[Compute Pearson Correlation]
-    F --> G
-    G --> H[Output Connectivity Matrix]
-
 ## Overview
 
 The analysis pipeline:
