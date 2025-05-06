@@ -25,8 +25,3 @@ This R script performs linear regression analysis with visualization of adjusted
   - `stats`
   - `visreg`
 
-## Installation
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/regression-partial-residuals.git
