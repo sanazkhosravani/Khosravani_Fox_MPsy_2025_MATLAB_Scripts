@@ -13,7 +13,7 @@
 #   * Continuous response variable (specified in model formula)
 #   * Continuous predictors
 #   * Categorical predictors (binary variables automatically converted to factors)
-# - Properly formatted Excel file with header row
+# - Properly formatted Excel file with header row (example file is provided in the same subfolder, named as Example_Input_Data)
 #
 # Output:
 # - model: Final fitted linear model object
@@ -35,7 +35,7 @@ invisible(lapply(required_packages, function(pkg) {
 }))
 
 # Load dataset from Excel file
-data <- read_excel("Path_to_your_data.xlsx")
+data <- read_excel("Path_to_your_data.xls")
 
 # ========================================================================
 # STEP 2: DATA PREPROCESSING
@@ -66,7 +66,7 @@ print(model_summary)
 # STEP 4: VISUALIZATION OF ADJUSTED RELATIONSHIPS
 # ========================================================================
 
-# Option 1: Using visreg (recommended for quick visualization)
+# Option 1: Using visreg (quicker visualization)
 visreg_plot <- visreg(model, "connectivity", gg = TRUE, 
                       line = list(color = "steelblue"),
                       points = list(size = 3, alpha = 0.6, color = "darkgray")) +
@@ -100,14 +100,3 @@ if ("connectivity" %in% names(coef(model))) {
 } else {
   warning("Primary predictor not found in model coefficients")
 }
-
-# ========================================================================
-# STEP 5: SAVE OUTPUT
-# ========================================================================
-
-# Save model results
-saveRDS(model, "linear_model_results.rds")
-
-# Save plots (adjust paths as needed)
-ggsave("visreg_plot.png", visreg_plot, width = 8, height = 6, dpi = 300)
-ggsave("manual_partial_residual_plot.png", manual_plot, width = 8, height = 6, dpi = 300)

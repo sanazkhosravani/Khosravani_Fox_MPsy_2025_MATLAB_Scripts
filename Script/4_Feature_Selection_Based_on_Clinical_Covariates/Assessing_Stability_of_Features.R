@@ -1,5 +1,5 @@
 # ========================================================================
-# ROBUST PREDICTOR SELECTION VIA SUBSAMPLING AND AIC OPTIMIZATION
+# ROBUST PREDICTOR SELECTION VIA SUBSAMPLING, AND AIC OPTIMIZATION
 # Prepared by Sanaz Khosravani, PhD
 # Last updated: May 2025
 #
@@ -11,7 +11,7 @@
 # Input Requirements:
 # - Dataframe with continuous response variable 'BDI_change'
 # - Mixed continuous/categorical predictors
-# - Properly formatted Excel file with header row
+# - Properly formatted Excel file with header row (example input file provided in the subfolder named as Example_Input_Data.mlx)
 #
 # Output:
 # - predictor_selection_count: Named vector of selection frequencies
@@ -23,7 +23,6 @@
 # ========================================================================
 
 # Load required package for reading Excel files
-# Note: readxl provides cross-platform compatibility for Excel formats
 library(readxl)
 
 # ========================================================================
@@ -32,15 +31,10 @@ library(readxl)
 
 # --- Data Import ---
 # Read dataset from Excel file 
-# Requirements:
-# - First row must contain variable names
-# - Response variable must be named 'BDI_change'
-# - Missing values should be properly encoded (NA or blanks)
 data <- read_excel("Path_to_your_data.xlsx")  # Replace with actual path
 
 # --- Categorical Variable Handling ---
 # Specify columns requiring factor conversion
-# Critical for proper dummy coding in regression models
 categorical_columns <- c(
   "categorical_predictor1",  # Example: "gender" (0,1)
   "categorical_predictor2"   # Example: "hospital site" (0,1)
@@ -56,9 +50,6 @@ data[categorical_columns] <- lapply(data[categorical_columns], as.factor)
 
 # --- AIC Calculation Function ---
 # Computes Akaike Information Criterion for model comparison
-# Lower AIC indicates better model balancing fit and complexity
-# Input: lm model object
-# Output: Numeric AIC value
 compute_aic <- function(model) {
   AIC(model)  # Uses stats::AIC() with default k=2 parameter
 }

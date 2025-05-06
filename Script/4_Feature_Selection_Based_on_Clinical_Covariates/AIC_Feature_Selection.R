@@ -1,5 +1,5 @@
 # ========================================================================
-# EXHAUSTIVE MODEL SELECTION USING AIC CRITERION
+# EXHAUSTIVE FEATURE SELECTION USING AIC CRITERION
 # Prepared by Sanaz Khosravani, PhD
 # Last updated: May 2025
 #
@@ -10,7 +10,7 @@
 # Input Requirements:
 # - Dataframe with continuous response variable 'y'
 # - Mixed continuous/categorical predictors
-# - Properly formatted Excel file with header row
+# - Properly formatted Excel file with header row (example input file provided in the subfolder named as Example_Input_Data.mlx)
 #
 # Output:
 # - best_model: Final selected lm object with lowest AIC
@@ -23,15 +23,10 @@
 # ========================================================================
 
 # Load required package for reading Excel files
-# Note: readxl provides cross-platform compatibility for Excel formats
 library(readxl)
 
 # --- Data Import ---
 # Read data from Excel file - Path should use forward slashes for compatibility
-# Expected format:
-# - First row: Variable names
-# - Subsequent rows: Observations
-# - Missing values should be properly encoded
 data <- read_excel("your_data_file.xlsx")  # Update path to actual data file
 
 # --- Categorical Variable Handling ---
@@ -44,7 +39,6 @@ categorical_columns <- c(
 )
 
 # Convert specified columns to factors
-# Factor conversion ensures proper dummy coding in linear models
 data[categorical_columns] <- lapply(data[categorical_columns], as.factor)
 
 # ========================================================================
@@ -54,19 +48,12 @@ data[categorical_columns] <- lapply(data[categorical_columns], as.factor)
 # --- AIC Calculation Wrapper ---
 # Computes Akaike Information Criterion for model comparison
 # Lower AIC indicates better model balancing fit and complexity
-# Input: lm model object
-# Output: Numeric AIC value
 compute_aic <- function(model) {
   AIC(model)  # Uses stats::AIC() with default k=2 parameter
 }
 
 # --- Predictor Selection Helper ---
 # Checks if specific predictor exists in current model
-# Useful for constrained model searches (currently not used in main workflow)
-# Input: 
-#   predictors: Character vector of current predictors
-#   predictor: Single predictor name to check
-# Output: Boolean
 is_predictor_chosen <- function(predictors, predictor) {
   predictor %in% predictors  # Returns TRUE if predictor is in current set
 }
@@ -114,8 +101,6 @@ for (i in 1:length(predictor_names)) {
       best_aic <- current_aic
       best_model <- current_model
       
-      # Optional progress output (uncomment if needed)
-      # cat("New best model with", i, "predictors. AIC =", current_aic, "\n")
     }
   }
 }
@@ -125,8 +110,4 @@ for (i in 1:length(predictor_names)) {
 # ========================================================================
 
 # --- Comprehensive Model Summary ---
-# Displays:
-# - Coefficient estimates and significance
-# - Residual distribution statistics
-# - Overall model fit metrics
 print(summary(best_model))

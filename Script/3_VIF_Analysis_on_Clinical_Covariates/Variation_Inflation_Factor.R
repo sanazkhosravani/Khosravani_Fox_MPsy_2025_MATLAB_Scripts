@@ -1,4 +1,4 @@
-# Install and load required packages
+# Install required packages
 install.packages("readxl")   # For reading Excel files
 install.packages("car")      # For variance inflation factor (VIF) calculation and other regression tools
 
