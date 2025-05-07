@@ -4,28 +4,28 @@ This repository contains MATLAB scripts for analyzing within- and between-subjec
 
 ## Code Overview
 
-### 1. `1_Example_Input_Data.mlx`
+### `1_Example_Input_Data.mlx`
 - **Purpose**: Calculates Euclidean distance-based variability metrics
 - **Functionality**:
   - Computes within-subject variability input data (distance to subject-specific centroid)
   - Computes between-subject variability input data (distance to group centroid)
 
-### 2. `2_Find_Equidistant_Point.mlx`
+### `2_Find_Equidistant_Point.mlx`
 - **Functionality**:
   - Finds the 3D point equidistant to three given site markings (circumcenter)
 
-### 3. `3_PlotEquidistantPoint.mlx`
+### `3_PlotEquidistantPoint.mlx`
 - **Functionality**:
   - Visualization of the equidistant point relative to the 3 input data points.
 
-### 4. `4_Variability_Site_Markings.mlx`
+### `4_Variability_Site_Markings.mlx`
 - **Purpose**: Statistical analysis of within- vs. between-individual TMS site variability data
 - **Functionality**:
   - Linear mixed-effects modeling (accounting for repeated measures)
   - Confidence interval estimation (parametric and bootstrap methods)
 - **Output**: Model results, ANOVA tables, and effect size estimates
 
-### 5. `5_Plot_Variability_Site_Markings_Within_versus_Between.mlx`
+### `5_Plot_Variability_Site_Markings_Within_versus_Between.mlx`
 - **Purpose**: Graphical representation of variability patterns
 - **Functionality**:
   - Jittered scatter plots of within- versus between-subject variability data
