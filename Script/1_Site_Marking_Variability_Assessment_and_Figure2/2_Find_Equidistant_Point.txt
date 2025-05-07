@@ -1,10 +1,7 @@
 function P_equidistant = EquidistantPoint3D(A, B, C)
-% EquidistantPoint3D(A, B, C)
 % 
-%   This function computes a point (the circumcenter) that is equidistant to 
-%   three given 3D points A, B, and C, which form a triangle.
-%
-%
+%   This function computes a point that is equidistant to 
+%   three 3-Dimensional data points, e.g., A, B, and C.
 %   Inputs:
 %       A,B,C : three-dimensional vectors with [Ax, Ay, Az], [Bx, By,
 %       Bz], [Cx, Cy, Cz]
@@ -19,7 +16,7 @@ function P_equidistant = EquidistantPoint3D(A, B, C)
 %       P = EquidistantPoint3D(A, B, C);  
 %
 %   Steps:
-%       1. Constructs perpendicular bisector planes based on AB and AC.
+%       1. Creates perpendicular bisector planes based on AB and AC.
 %       2. Uses the plane containing A, B, and C as a third constraint.
 %       3. Solves the resulting linear system to find the intersection point.
 
@@ -28,24 +25,24 @@ function P_equidistant = EquidistantPoint3D(A, B, C)
     midpoint_AC = (A + C) / 2;  
 
     % --- Compute direction vectors AB and AC ---
-    dir_AB = B - A;  
-    dir_AC = C - A;  
+    direction_AB = B - A;  
+    direction_AC = C - A;  
 
     % --- Compute normal vector to the plane ABC ---
-    normal = cross(dir_AB, dir_AC);
+    normal = cross(direction_AB, direction_AC);
 
     % --- Form the system of equations ---
     % The equidistant point:
     %   1. Lies on the perpendicular bisector plane of AB:
-    %       (P - midpoint_AB) · dir_AB = 0
+    %       (P - midpoint_AB) · direction_AB = 0
     %   2. Lies on the perpendicular bisector plane of AC:
-    %       (P - midpoint_AC) · dir_AC = 0
+    %       (P - midpoint_AC) · direction_AC = 0
     %   3. Lies on the plane containing A, B, and C:
     %       (P - A) · normal = 0
     %
-    M = [dir_AB; dir_AC; normal]; 
-    b = [dot(midpoint_AB, dir_AB); 
-         dot(midpoint_AC, dir_AC); 
+    M = [direction_AB; direction_AC; normal]; 
+    b = [dot(midpoint_AB, direction_AB); 
+         dot(midpoint_AC, direction_AC); 
          dot(normal, A)];          
 
     % --- Solve for P_equidistant ---
