@@ -14,7 +14,7 @@ This repository contains MATLAB scripts for analyzing within- and between-subjec
 - **Functionality**:
   - Finds the 3D point equidistant to three given site markings (circumcenter)
 
-### 3. `3_VisualizeEquidistantPoint.mlx`
+### 3. `3_PlotEquidistantPoint.mlx`
 - **Functionality**:
   - Visualization of the equidistant point relative to the 3 input data points.
 
