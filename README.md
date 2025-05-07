@@ -52,12 +52,12 @@ To reproduce our analyses, the following software packages are required:
 
 
 ### Table of Contents:
-- 1_Site_Marking_Variability_Assessment_and_Figure2: Assessment of Variability of TMS Site Markings
+- 1_Site_Marking_Variability_Assessment_and_Figure2: Assessment of the Variability of TMS Site Markings and Visualization of Differences (Figure 2)
 - 2_Computing_ROI_ROI_Connectivity: Example Script for Generating ROI-ROI Connectivity Values between the TMS Site and Subgenual Cingulate Region
-- 3_VIF_Analysis_on_Clinical_Covariates: Assessment of Collinearity of Variables
-- 4_Feature_Selection_Based_on_Clinical_Covariates: Feature Selection and Assessment of the Stability of Features
-- 5_Code_for_Generating_Figure3: Generating Manuscript Figure 3 (Primary Outcome)
-- 6_Analysis_of_Spatial_Topography: Analysis of the Spatial Topography of the Depression Improvement Network Before and After Incorporating Clinical Covariates
+- 3_VIF_Analysis_on_Clinical_Covariates: Assessment of Variable Collinearity Using VIF Analysis
+- 4_Feature_Selection_Based_on_Clinical_Covariates: Feature Selection and Evaluation of Feature Stability
+- 5_Code_for_Generating_Figure3: Script for Generating Manuscript Figure 3 (Primary Outcome)
+- 6_Analysis_of_Spatial_Topography: Generating the Spatial Topography of Voxel-Wise Functional Connectivity to TMS Site Correlating with Antidepressant Response
 
 As an analogous normative connectome to the one used in this study, researchers may consider using the GSP connectome, which is openly accessible and can be downloaded from Harvard Dataverse. This dataset offers a preprocessed connectome that can be used for comparison and analysis in studies related to brain network analysis.
 Reference: Cohen, A., Soussand, L., McManus, P., & Fox, M. (2020). GSP1000 preprocessed connectome. Harvard Dataverse. https://doi.org/10.7910/DVN/ILXIKS
