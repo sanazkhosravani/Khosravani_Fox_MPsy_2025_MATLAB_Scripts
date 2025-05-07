@@ -53,8 +53,8 @@ To reproduce our analyses, the following software packages are required:
 
 ### Table of Contents:
 - 1_Site_Marking_Variability_Assessment_and_Figure2: Assessment of Variability of TMS Site Markings
-- 2_Computing_ROI_ROI_Connectivity: Example Script for Generating ROI-ROI Connectivity Values Between the TMS Site and Subgenual Cingulate Region
-- 3_VIF_Analysis_on_Clinical_Covariates: Assessment of the Primary Outcome
+- 2_Computing_ROI_ROI_Connectivity: Example Script for Generating ROI-ROI Connectivity Values between the TMS Site and Subgenual Cingulate Region
+- 3_VIF_Analysis_on_Clinical_Covariates: Assessment of Collinearity of Variables
 - 4_Feature_Selection_Based_on_Clinical_Covariates: Feature Selection and Assessment of the Stability of Features
 - 5_Code_for_Generating_Figure3: Generating Manuscript Plots
 - 6_Analysis_of_Spatial_Topography: Analysis of the Spatial Topography of the Depression Improvement Network Before and After Incorporating Clinical Covariates
