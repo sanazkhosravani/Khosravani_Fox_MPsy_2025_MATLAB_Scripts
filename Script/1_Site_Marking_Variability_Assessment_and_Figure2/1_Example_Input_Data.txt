@@ -1,0 +1,88 @@
+
+% ========================================================================
+% Within- and Between-Subject Variability Analysis of TMS/MT Site Markings
+% Prepared by Sanaz Khosravani, PhD 
+% Last updated: May 2025
+%
+% This script estimates:
+% 1. Within-subject variability of site markings: Euclidean distance between each existing session of site marking
+%    and the subject-specific averaged site
+% 2. Between-subject variability of site markings: Euclidean distance between each existing session of site marking
+%    and the group-averaged site
+%
+% Input Data: Three-dimensional TMS or MT site coordinates in the MNI space for study
+% participants
+% Output Data: Distance from each session to the averaged site (either within or between)
+% 
+% To compute within-subject variability data for individuals with > 2 site
+% markings, as an alternative to distance from the averaged point, you can use the distance
+% to the equidistance point (use 3_Find_Equidistant_Point.mlx).
+% ========================================================================
+
+%% Example Data (Replace with actual TMS/MT site coordinates in MNI space)
+% Each cell array contains coordinates for one subject
+Subject1_SiteMarkings = {[10, 10, 10], [12, 11, 9]};  % Subject with 2 site markings
+Subject2_SiteMarkings = {[15, 8, 12]};                % Subject with 1 site marking  
+Subject3_SiteMarkings = {[9, 12, 11], [8, 13, 10], [10, 11, 12]}; % Subject with 3 markings
+
+% Combine all subjects' data into one cell array for processing
+all_subjects = {Subject1_SiteMarkings, Subject2_SiteMarkings, Subject3_SiteMarkings};
+
+%% Part 1: Within-Subject Variability Analysis
+% Calculates for each subject:
+% - Centroid (average coordinate) of their site markings
+% - Euclidean distance from each site marking to their centroid
+% - Averaged distance to be used for within-subject variability assessment
+
+fprintf('=== GENERATING DATA FOR WITHIN-SUBJECT VARIABILITY ANALYSIS ===\n');
+
+subject_centroids = [];  % Stores centroid for each subject
+all_markings = [];       % Aggregates all site markings for between-subject analysis
+
+for subj = 1:length(all_subjects)
+    % Convert current subject's markings from cell to matrix format
+    markings = cell2mat(all_subjects{subj}');
+    
+    % Calculate subject centroid (averaged coordinate across all their markings)
+    subject_centroid = mean(markings, 1);
+    subject_centroids = [subject_centroids; subject_centroid];
+    
+    % Compute Euclidean distance from each marking to subject's averaged point 
+    distances = sqrt(sum((markings - subject_centroid).^2, 2));
+    
+    % Display within-subject variability measure
+    fprintf('Subject %d - Mean distance to centroid: %.2f mm\n', subj, mean(distances));
+    
+end
+
+%% Part 2: Between-Subject Variability Analysis
+% Calculates for the entire group:
+% - Group centroid (mean of all markings across subjects)
+% - Euclidean distance from each marking to group centroid to be used for
+% between-subject variability assessment
+
+fprintf('\n=== GENERATING DATA FOR BETWEEN-SUBJECT VARIABILITY ANALYSIS ===\n');
+
+% Re-initialize data (redundant in current script, shown for completeness)
+Subject1_SiteMarkings = {[10, 10, 10], [12, 11, 9]};
+Subject2_SiteMarkings = {[15, 8, 12]};
+Subject3_SiteMarkings = {[9, 12, 11], [8, 13, 10], [10, 11, 12]};
+all_subjects = {Subject1_SiteMarkings, Subject2_SiteMarkings, Subject3_SiteMarkings};
+
+% Aggregate all markings from all subjects into one matrix
+all_markings = [];
+for subj = 1:length(all_subjects)
+    markings = cell2mat(all_subjects{subj}');
+    all_markings = [all_markings; markings];
+end
+
+% Calculate the mean of all site markings
+group_centroid = mean(all_markings, 1);
+
+% Compute Euclidean distance from each site marking to group averaged site
+between_distances = sqrt(sum((all_markings - group_centroid).^2, 2));
+
+% Display results
+fprintf('Group centroid coordinates: [%.2f, %.2f, %.2f]\n', group_centroid);
+fprintf('Distances from all markings to group centroid (mm):\n');
+disp(between_distances');
