@@ -1,6 +1,6 @@
 % ========================================================================
 % MAPPING THE SPATIAL TOPOGRAPHY OF FUNCTIONAL CONNECTIONS TO TMS SITE
-% CORRELATING WINTH ANTIDEPRESSANT RESPONSE.
+% CORRELATING WITH ANTIDEPRESSANT RESPONSE.
 % 
 % Prepared by: Sanaz Khosravani, PhD (based on an earlier master script developed by Shan H. Siddiqi and modified by Stephan T. Palm)
 % Last updated: May 2025

@@ -4,10 +4,6 @@ function P_equidistant = EquidistantPoint3D(A, B, C)
 %   This function computes a point (the circumcenter) that is equidistant to 
 %   three given 3D points A, B, and C, which form a triangle.
 %
-%   The solution is found by solving a system of linear equations derived
-%   from the perpendicular bisector planes of two edges and the plane
-%   containing all three points.
-%
 %   Inputs:
 %       A, B, C : 3-element row vectors [x, y, z]
 %           The 3D coordinates of the three points.
