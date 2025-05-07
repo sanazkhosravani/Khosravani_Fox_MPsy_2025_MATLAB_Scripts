@@ -1,0 +1,149 @@
+% ========================================================================
+% Contrasting within- versus between-subject variability of TMS (or MT)
+% site markings (Visualization)
+% Prepared by Sanaz Khosravani, PhD 
+% Last updated: May 2025
+%
+% This script creates a figure similar to manuscript Figure 2, contrasting:
+% 1. Within-subject variability (distance to subject-specific averaged site marking)
+% 2. Between-subject variability (distance to group-averaged site marking)
+%
+% Visualization includes:
+% - Jittered scatter plot of measured distance values
+% - Mean values with 95% confidence intervals
+%
+% All distance measures are Euclidean distances in MNI standard space (mm)
+% ========================================================================
+
+% ========================================================================
+% EXAMPLE DATA GENERATION FOR TMS SITE VARIABILITY VISUALIZATION
+% 
+% This creates synthetic data as follows:
+% - Within-subject variability (20 subjects, 5 measurements each)
+% - Between-subject variability (100 measurements from different subjects)
+%
+% ========================================================================
+
+% Set random seed for reproducibility
+rng(2025);
+
+%% Within-subject variability data (l1tx = 100 measurements from 20 subjects)
+% Each subject has their own "true" site location with random variability
+n_subjects = 20;
+measurements_per_subject = 5;
+subject_means = 5 + 2*randn(n_subjects,1); % Base distances vary by subject (mean~5mm)
+within_subject_var = 1.5; % Standard deviation of within-subject variability
+
+% Generate measurements
+within_data = [];
+for s = 1:n_subjects
+    within_data = [within_data; subject_means(s) + within_subject_var*randn(measurements_per_subject,1)];
+end
+l1tx = length(within_data); % Should be 100
+
+%% Between-subject variability data (l2tx = 100 measurements)
+% These represent distances to the group centroid
+between_mean = 8; % Hypothetically larger than within-subject distances
+between_sd = 2.5;
+between_data = between_mean + between_sd*randn(100,1);
+l2tx = length(between_data); % Should be 100
+
+%% Combine all measurements (ytx)
+ytx = [within_data; between_data];
+
+%% Calculate statistics for plotting (for running this code on the actual data, please use the values computed in the code: 1_Example_Input_Data.mlx)
+% Means
+y_2tx = [mean(within_data), mean(between_data)];
+
+% 95% Confidence Intervals (parametric)
+CI_tx_wi_norm = [mean(within_data)-1.96*std(within_data)/sqrt(l1tx),...
+                mean(within_data)+1.96*std(within_data)/sqrt(l1tx)];
+            
+CI_tx_bt_norm = [mean(between_data)-1.96*std(between_data)/sqrt(l2tx),...
+                mean(between_data)+1.96*std(between_data)/sqrt(l2tx)];
+
+% p-value from unpaired t-test (please use the p-value estimated using the linear mixed effect model illustrated in: 2_Variability_Site_Markings.mlx)
+[~, p_tx_unpaired] = ttest2(within_data, between_data);
+
+
+% Create figure with white background and specified size
+figure('Color', 'white', 'Position', [100, 100, 800, 600]);
+
+colors = [0.2 0.6 0.8]; 
+
+% Create tiled layout for the plot (1x1 grid)
+t = tiledlayout(1,1);
+ax1 = axes(t);
+
+% Create jitter plot showing individual data points
+% - l1tx/l2tx contain counts for within/between groups
+% - ytx contains all distance measurements for within/between groups
+scatter([0.1*ones(l1tx(1),1); 0.4*ones(l2tx(1),1)], ytx, 80, ...
+    'MarkerFaceColor', [colors(1,:)], ...
+    'jitter', 'on', ...               % Add jitter for visibility
+    'jitterAmount', 0.03);            % Control jitter spread
+
+title('Variability in TMS Stimulation Distances', ...
+    'FontSize', 18, 'FontWeight', 'bold');
+ylabel('Distance (mm)', 'FontSize', 16, 'FontWeight', 'bold');
+ylim([0 ceil(max(ytx)/5)*5]); % Round up y-axis to nearest 5mm
+
+xlim([0 0.5]);
+xticks([0.1 0.4]);                    % Positions for group labels
+xticklabels({'Within-Subject', 'Between-Subjects'});
+ax1.XAxis.FontSize = 14;              % Set font size for axes
+ax1.YAxis.FontSize = 14;
+grid on;                              % Add grid for readability
+box on;                               % Add bounding box
+
+% Create second axes overlay for statistical information
+ax2 = axes(t);
+hold on;
+
+% Plot mean lines connecting the two group means
+plot([0.1 0.4], y_2tx, 'k-', 'LineWidth', 2);
+
+% Add error bars showing 95% confidence intervals
+% CI_tx_wi_norm - within-subject CI bounds
+% CI_tx_bt_norm - between-subjects CI bounds
+errorbar([0.1 0.4], y_2tx, ...
+    y_2tx - [CI_tx_wi_norm(1), CI_tx_bt_norm(1)], ...  
+    [CI_tx_wi_norm(2), CI_tx_bt_norm(2)] - y_2tx, ...  
+    'LineStyle', 'none', ...
+    'LineWidth', 2, ...
+    'CapSize', 15, ...                  
+    'color', 'k');
+
+% Add diamond markers at mean positions
+scatter([0.1 0.4], y_2tx, 150, 'd', ...
+    'MarkerFaceColor', 'k', ...
+    'MarkerEdgeColor', 'k');
+
+% Add p-value annotation (from unpaired comparison)
+if p_tx_unpaired < 0.001
+    p_text = 'p < 0.001';              % Standard format for small p-values
+else
+    p_text = ['p = ' num2str(p_tx_unpaired, '%.3f')]; % 3 decimal places
+end
+
+text(0.25, max(ytx)*0.9, p_text, ...  % Position above center
+    'FontSize', 14, ...
+    'HorizontalAlignment', 'center', ...
+    'BackgroundColor', 'white');       % For better visibility
+
+plot([0.1 0.4], [max(ytx)*0.85 max(ytx)*0.85], 'k-', 'LineWidth', 1);
+plot([0.1 0.1], [max(ytx)*0.83 max(ytx)*0.85], 'k-', 'LineWidth', 1);
+plot([0.4 0.4], [max(ytx)*0.83 max(ytx)*0.85], 'k-', 'LineWidth', 1);
+
+% Hide the second axes while keeping its content visible
+ax2.Visible = 'off';
+xlim([0 0.5]);
+ylim([0 ceil(max(ytx)/5)*5]);
+hold off;
+
+legend({'Individual Measurements', 'Mean ± 95% CI'}, ...
+    'Location', 'northwest', ...      % Position in upper left
+    'FontSize', 12);
+
+set(gcf, 'Color', 'w');               % Ensure white background
+set(gca, 'LineWidth', 1.5);           % Thicker axis lines

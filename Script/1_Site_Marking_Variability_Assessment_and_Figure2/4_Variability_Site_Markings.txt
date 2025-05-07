@@ -1,0 +1,113 @@
+% ========================================================================
+% TMS Site Marking Variability Analysis 
+% Prepared by Sanaz Khosravani, PhD 
+% Last updated: May 2025
+%
+% This script constrasts:
+% 1. Within-subject variability values (distance to subject-specific averaged site)
+% 2. Between-subject variability values (distance to group-averaged site)
+% 
+% Analysis includes:
+% - Linear mixed-effects modeling
+% - Confidence interval estimation (both parametric and bootstrap)
+%
+% All distance measures are Euclidean distances in the MNI standard space (mm)
+% ========================================================================
+
+%% DATA ORGANIZATION SECTION
+
+% --- Between-Subject Variability Data ---
+% Euclidean distances between each TMS marking and the group average
+% Each measurement has:
+% - Distance value (mm)
+% - Hospital site identifier (0 or 1)
+% - Subject ID
+
+tx_bt = [ ... ];  % Array of between-subject Euclidean distances (N×1)
+site_bt = [ ... ]; % Binary array indicating hospital site (0=siteA, 1=siteB)
+subject_bt = { ... }; % Cell array of subject identifiers
+
+% --- Within-Subject Variability Data ---
+% Euclidean distances between each TMS site marking and the subject's
+% averaged site marking
+
+tx_wi = [ ... ];  % Array of within-subject Euclidean distances (M×1)
+site_wi = [ ... ]; % Binary array indicating hospital site (0=siteA, 1=siteB)
+subject_wi = { ... }; % Cell array of subject identifiers
+
+% Combine both variability types into single arrays
+values = [tx_bt; tx_wi];  % Concatenate all distance measurements
+
+% Create categorical variables for modeling:
+% types: Distinguishes between within/between variability measurements
+% sites: Identifies hospital site (0 or 1)
+% subject: Subject identifiers for random effects
+
+types = [repmat({'between'}, length(tx_bt), 1);  % Create 'between' labels
+        repmat({'within'}, length(tx_wi), 1)];   % Create 'within' labels
+        
+sites = [site_bt; site_wi];  % Combine site indicators
+subject = [subject_bt'; subject_wi'];  % Combine subject IDs
+
+% Convert to categorical variables 
+types = categorical(types, {'between', 'within'});
+sites = categorical(sites);
+subject = categorical(subject);
+
+% Create data table for mixed-effects modeling
+% Variables:
+% - variability: Euclidean distance (dependent variable)
+% - type: Within/between classification (fixed effect)
+% - site: Hospital site (fixed effect)
+% - subject: Random effect for repeated measures
+dataTable = table(values, types, sites, subject, ...
+    'VariableNames', {'variability', 'type', 'site', 'subject'});
+
+%% STATISTICAL MODELING SECTION
+
+% Linear Mixed-Effects Model Specification:
+% Fixed Effects:
+% - type: Tests if within/between variability differs significantly
+% - site: Tests for hospital site differences
+% Random Effects:
+% - (1|subject): Accounts for repeated measures within subjects
+
+lmeModel = fitlme(dataTable, ...
+    'variability ~ type + site + (1|subject)');  % Model formula
+
+% Display full model results including:
+disp('Linear Mixed-Effects Model Results:');
+disp(lmeModel);
+
+% ANOVA for Fixed Effects:
+disp('ANOVA for Fixed Effects:');
+disp(anova(lmeModel));
+
+% Second approach: assessing the above model while quantifying subject differences after
+% accounting for site
+lmeModel = fitlme(dataTable, 'variability ~ type + site + (1|site) + (1|site:subject)');
+disp(lmeModel);
+
+%% CONFIDENCE INTERVAL CALCULATION
+
+% --- Parametric CIs (Assumes Normal Distribution) ---
+
+% Within-Subject Variability CIs
+SEM_wi = std(tx_wi)/sqrt(length(tx_wi));  % Standard Error of Mean
+t_critical = tinv([0.025 0.975], length(tx_wi)-1);  % 95% CI t-values
+CI_wi_param = mean(tx_wi) + t_critical*SEM_wi;  % Parametric 95% CI
+
+% Between-Subject Variability CIs
+SEM_bt = std(tx_bt)/sqrt(length(tx_bt));
+t_critical = tinv([0.025 0.975], length(tx_bt)-1);
+CI_bt_param = mean(tx_bt) + t_critical*SEM_bt;
+
+% --- Bootstrap CIs (Non-parametric, preferred when data may not be normally distributed) ---
+nBoot = 20000;  % Number of bootstrap resamples (large for stability)
+
+% Within-Subject Bootstrap CI
+CI_wi_boot = bootci(nBoot, @mean, tx_wi);  % 95% percentile CI
+
+% Between-Subject Bootstrap CI
+CI_bt_boot = bootci(nBoot, @mean, tx_bt);
+

@@ -1,0 +1,125 @@
+% ========================================================================
+% ROI-ROI CORRELATION ANALYSIS BETWEEN TMS FIELD DISTRIBUTION Model AND SUBGENUAL CINGULATE (SGC) MASK
+% Prepared by Sanaz Khosravani, PhD 
+% Last updated: May 2025
+%
+% Computes resting-state functional connectivity between:
+% 1) Subject-specific TMS stimulation field models
+% 2) Standard SGC mask
+%
+% Input Requirements:
+% - Individual spatial field decay models of TMS sites (modeled as weighted spheres)
+% - Resting-state fMRI timecourses for all subjects (Note: While the study utilized a normative connectome, this code assumes access to individual fMRI data to demonstrate the methodology.)
+% - Standard SGC mask
+% - MNI brain mask
+%
+% Output:
+% - conn_indiv: each row (one specific TMS site), each column (connectivity between that specific
+% TMS model and the SGC mask for each subject).
+% - mean_connectivity: average TMS site-SGC connectivity across all subjects for one specific TMS site model.
+% ========================================================================
+
+% Initialize subject list (replace with actual subject IDs)
+SUBJ_Inclusive = [1000,1001,...];  % Array of subject IDs to include in analysis
+SUBJ = SUBJ_Inclusive;             % Working subject list 
+
+% Load MNI brain mask (binary matrix where 1=brain voxel, 0=non-brain)
+load("mni_mask.mat");  % Expected dimensions: 91×109×91 (MNI 2mm space), included in the subfolder named Supplementary_Functions_Materials
+
+% Get number of subjects from ID list
+number_of_subjects = size(SUBJ,2);  % Determines size of correlation matrix
+
+% Preallocate correlation matrix (subject × subject)
+conn_indiv = zeros(number_of_subjects, number_of_subjects);  % Will store all pairwise correlations
+
+% =========================================================================
+% MAIN ANALYSIS LOOP - COMPUTES ALL PAIRWISE CORRELATIONS
+% =========================================================================
+for i = 1:number_of_subjects
+    % Current subject ID (to identify the TMS field model)
+    ID = SUBJ(i);  
+    
+    % ---------------------------------------------------------------------
+    % STEP 1: PROCESS TMS SITE MASK FOR CURRENT SUBJECT
+    % ---------------------------------------------------------------------
+    % Load subject's TMS field model file
+    TMSsite = sprintf('%d_Example_TMS_Field_Decay_Spherical_Model.nii.gz',ID);
+    mask = load_nii(TMSsite);  % Load 3D NIfTI file using load_nii
+    
+    % Reshape 3D mask to 1D vector (MNI 2mm space has 902629 voxels)
+    all_voxels_TMSsite_mask = reshape(mask.img, [adjust based on dimensions of data], 1);  
+    
+    % Apply MNI mask to exclude non-brain voxels
+    TMSsite_cells = mask_4dfpimg(all_voxels_TMSsite_mask, mni_mask, 'remove');  
+    
+    % Convert to single precision and mask non-ROI voxels (set to NaN)
+    roi_TMSsite = single(TMSsite_cells);  
+    roi_TMSsite(roi_TMSsite == 0) = NaN;  % Critical for nanmean operation later
+
+    % ---------------------------------------------------------------------
+    % STEP 2: COMPARE WITH ALL SUBJECTS' TIMECOURSES
+    % ---------------------------------------------------------------------
+    for j = 1:number_of_subjects
+        ID_subj = SUBJ(j);  % Current subject for timecourse data
+        
+        % Load preprocessed fMRI data (4D NIfTI: voxels × time)
+        timecourse = sprintf('Time_Course.nii.gz',ID_subj);
+        V_all = load_nii(timecourse);  
+        
+        % Reshape to 2D matrix (voxels × timepoints)
+        s = size(V_all.img,4);  % Get number of timepoints
+        V_mid = reshape(V_all.img, [902629 s]);  % Standard MNI 2mm reshape
+        
+        % Apply MNI mask to exclude non-brain voxels
+        V = mask_4dfpimg(V_mid, mni_mask, 'remove');  
+        tc = V;  % Cleaned timecourse data ready for analysis
+
+        % -------------------------------------------------------------
+        % STEP 3: EXTRACT MEAN TIMECOURSE FROM TMS SITE
+        % -------------------------------------------------------------
+        % Weight timecourses by TMS ROI mask (NaN handling preserves only ROI voxels)
+        tc_weighted_roi_TMSsite = tc .* roi_TMSsite;  
+        
+        % Compute mean timecourse across ROI voxels (ignores NaNs)
+        avgroitc_TMSsite_indiv = nanmean(tc_weighted_roi_TMSsite, 1);  
+        sig_tms = avgroitc_TMSsite_indiv;  % Final TMS site timecourse
+
+        % -------------------------------------------------------------
+        % STEP 4: EXTRACT MEAN TIMECOURSE FROM SGC MASK
+        % -------------------------------------------------------------
+        % Load standard SGC mask (same anatomical mask for all subjects)
+        SGoriginal = 'SGC_Mask.nii.gz';  
+        mask = load_nii(SGoriginal);  
+        all_voxels_SGoriginal_mask = reshape(mask.img, [adjust based on dimensions of data], 1);  
+        
+        % Apply MNI mask and convert to single precision
+        SGoriginal_cells = mask_4dfpimg(all_voxels_SGoriginal_mask, mni_mask, 'remove');  
+        roi_SGoriginal = single(SGoriginal_cells);  
+        roi_SGoriginal(roi_SGoriginal == 0) = NaN;  % Exclude non-ROI voxels
+
+        % Weight timecourses by SG mask
+        tc_weighted_SGoriginals = tc .* roi_SGoriginal;  
+        
+        % Compute mean timecourse across SG voxels
+        avgroitc_SGoriginal_indiv = nanmean(tc_weighted_SGoriginals, 1);  
+        sig_sg = avgroitc_SGoriginal_indiv;  % Final SGC timecourse
+
+        % -------------------------------------------------------------
+        % STEP 5: COMPUTE PEARSON CORRELATION BETWEEN ROIs
+        % -------------------------------------------------------------
+        % Calculate correlation (handles NaN values via 'rows','complete')
+        conn_indiv(i,j) = corr(sig_sg', sig_tms', "rows", "complete", "type", "Pearson");  
+    end
+    
+    % Display progress after processing each seed subject
+    fprintf('Completed TMS Site %d/%d\n', i, number_of_subjects);  
+end
+
+% Display final correlation matrix
+disp('ROI-ROI correlation matrix:');  
+disp(conn_indiv);  
+
+% ========================================================================
+% To obtain connectome-level connectivity value between each TMS site and
+% SGC, average connectivity data at each row across all subjects.
+% ========================================================================

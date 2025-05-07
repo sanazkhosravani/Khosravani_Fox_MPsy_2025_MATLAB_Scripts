@@ -1,0 +1,62 @@
+function P_equidistant = EquidistantPoint3D(A, B, C)
+% EquidistantPoint3D(A, B, C)
+% 
+%   This function computes a point (the circumcenter) that is equidistant to 
+%   three given 3D points A, B, and C, which form a triangle.
+%
+%   The solution is found by solving a system of linear equations derived
+%   from the perpendicular bisector planes of two edges and the plane
+%   containing all three points.
+%
+%   Inputs:
+%       A, B, C : 3-element row vectors [x, y, z]
+%           The 3D coordinates of the three points.
+%
+%   Output:
+%       P_equidistant : 3-element row vector [x, y, z]
+%           The computed circumcenter (equidistant to A, B, and C).
+%
+%   Example:
+%       A = [1, 2, 3];
+%       B = [2, -1, 3];
+%       C = [2, 0, 0];
+%       P = EquidistantPoint3D(A, B, C);  % Computes the circumcenter
+%
+%   Algorithm:
+%       1. Constructs perpendicular bisector planes of AB and AC.
+%       2. Uses the plane containing A, B, and C as a third constraint.
+%       3. Solves the resulting linear system to find the intersection point.
+
+    % --- Compute midpoints of edges AB and AC ---
+    midpoint_AB = (A + B) / 2;  % Geometric midpoint between A and B
+    midpoint_AC = (A + C) / 2;  % Geometric midpoint between A and C
+
+    % --- Compute direction vectors AB and AC ---
+    dir_AB = B - A;  % Vector from A to B 
+    dir_AC = C - A;  % Vector from A to C 
+
+    % --- Compute normal vector to the plane ABC ---
+    % The cross product gives a vector perpendicular to both AB and AC,
+    % defining the plane's orientation.
+    normal = cross(dir_AB, dir_AC);
+
+    % --- Construct system of equations ---
+    % The equidistant point must satisfy:
+    %   1. Lies on the perpendicular bisector plane of AB:
+    %       (P - midpoint_AB) · dir_AB = 0
+    %   2. Lies on the perpendicular bisector plane of AC:
+    %       (P - midpoint_AC) · dir_AC = 0
+    %   3. Lies on the plane containing A, B, and C:
+    %       (P - A) · normal = 0
+    %
+    % Rewritten in matrix form: M * P' = b
+    M = [dir_AB; dir_AC; normal];  % Coefficient matrix (3x3)
+    b = [dot(midpoint_AB, dir_AB); % RHS for AB bisector 
+         dot(midpoint_AC, dir_AC); % RHS for AC bisector 
+         dot(normal, A)];          % RHS for ABC plane equation
+
+    % --- Solve for P_equidistant ---
+    P_equidistant = (M \ b)';  % Solve M*P' = b, then transpose to row vector
+
+end
+

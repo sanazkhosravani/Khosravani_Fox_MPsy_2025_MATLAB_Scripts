@@ -1,0 +1,143 @@
+% ========================================================================
+% MAPPING THE SPATIAL TOPOGRAPHY OF FUNCTIONAL CONNECTIONS TO TMS SITE
+% CORRELATING WINTH ANTIDEPRESSANT RESPONSE.
+% 
+% Prepared by: Sanaz Khosravani, PhD (based on an earlier master script developed by Shan H. Siddiqi and modified by Stephan T. Palm)
+% Last updated: May 2025
+%
+% Purpose:
+%   This script analyzes the relationship between functional connectivity 
+%   patterns and changes in depression symptoms pre- vs. post-TMS, controlling for clinical covariates,
+%   and compares results with existing literature maps.
+%
+% Processing Pipeline:
+%   1. Load and preprocess connectivity maps for each specific TMS site
+%   developed based on the normative connectome of 1000 healthy individuals
+%   2. Calculate partial correlations of connectivity values at each voxels
+%   across all individuals with symptom change for all individuals
+%   3. Perform spatial correlation with reference maps
+%
+% Input Requirements:
+%   - NIfTI format connectivity maps (gzipped)
+%   - MNI mask template
+%   - Clinical data matrix with covariates
+%   - Reference depression map from literature (Siddiqi...Fox, 2021)
+%
+% Outputs:
+%   - Data-driven spatial maps of functional connections to TMS site
+%   correlating with antidepressant response (adjusted for clinical covariates)
+%   - Spatial correlation between the data-driven map and the reference
+%   depression map
+%
+% ========================================================================
+
+%% INITIALIZATION AND DATA LOADING
+% ------------------------------------------------------------------------
+% Section 1.1: Data Processing and Correlation Analysis
+% Purpose: Process connectivity maps and compute symptom correlations
+% ------------------------------------------------------------------------
+
+% Set working directory to project folder containing connectivity maps
+project_dir = "Path_to_connectivity_maps";
+cd(project_dir);
+
+% Subject selection parameters
+subject_list = [list_of_subject_ids];  % Array of all available subjects
+select = [analysis_subset_ids];        % Row identifier of the subset of subjects to include in the analysis
+
+% Load MNI brain mask for spatial normalization
+% Note: Mask should be binary (1=included voxels, 0=excluded)
+load('mni_mask.mat');  % Expected variable name: template_mask
+
+% Initialize data matrices
+connectivity_values = [];      % To store raw connectivity values
+all_voxel_data = [];           % To store voxel-wise data
+connectivity_map = [];         % To store masked connectivity values
+
+%% SUBJECT-LEVEL DATA PROCESSING
+% ------------------------------------------------------------------------
+% Loop through selected subjects to:
+%   1. Load individual connectivity maps
+%   2. Concatenate all normative TMS site connectivity maps
+% ------------------------------------------------------------------------
+
+for subj_idx = 1:length(select)
+    % Get current subject ID from selection list
+    subject_id = subject_list(select(subj_idx));
+    
+    % Load preprocessed connectivity data
+    % File naming convention: for example, [ID]_connectivity_data.nii.gz
+    neuroimaging_file = sprintf('%d_connectivity_data.nii.gz', subject_id);
+    nii_data = load_nii(neuroimaging_file);  % Requires NIfTI toolbox
+    
+    % Reshape 3D volume to 1D vector (voxels × 1)
+    voxel_vector = reshape(nii_data.img, [total_voxels 1]);
+    
+    % Store raw voxel data (subjects × voxels)
+    all_voxel_data(subj_idx,:) = voxel_vector;
+    
+    % Apply MNI mask to exclude non-brain voxels
+    masked_values = apply_mask(voxel_vector, template_mask, 'remove');
+    
+    % Store masked connectivity values
+    connectivity_map(subj_idx,:) = masked_values;
+end
+
+%% STATISTICAL ANALYSIS
+% ------------------------------------------------------------------------
+% Partial correlation analysis controlling for:
+%   - Baseline depression scores
+%   - Effect of hospital site
+%   - Other clinical covariates
+% ------------------------------------------------------------------------
+
+% Extract clinical variables
+depression_change = clinical_data.depression_change(select);
+baseline_scores = clinical_data.baseline_scores(select);
+site = clinical_data.site(select);
+other_covariates = clinical_data.other_vars(select,:); % example for any other clinical covariate to include the partial correlation analysis
+
+% Compute partial correlations
+% Using Pearson correlation with complete case analysis
+[partial_corr_results, p_values] = partialcorr(...
+    connectivity_map, ...               % Neural data (subjects × voxels)
+    depression_change, ...              % Outcome measure
+    [baseline_scores site other_covariates], ...  % Covariates
+    'Rows', 'complete', ...             % Exclude missing data
+    'Type', 'spearman');                 % Linear correlation
+
+%% RESULTS SAVING
+% ------------------------------------------------------------------------
+% Save statistical maps back to NIfTI format for visualization
+% ------------------------------------------------------------------------
+
+NiiWrite2_MNImask_local(r,'depression_correlation_map',0,0);
+% Convert header format for compatibility
+result_file = 'depression_correlation_map.hdr';
+nii_hdr2nii(result_file);  % Requires appropriate conversion tool
+
+%% SPATIAL VALIDATION ANALYSIS
+% ------------------------------------------------------------------------
+% Section 1.2: Compare with Literature-Derived Depression Map (Siddiqi...Fox, 2021)
+% ------------------------------------------------------------------------
+
+% Load reference depression map from published literature
+reference_image = load_nii('literature_depression_map.nii');
+ref_voxels = reshape(reference_image.img, [total_voxels 1]); 
+reference_map_masked = apply_mask(ref_voxels, template_mask, 'remove'); % template mask can be mni_mask.mat provided in the subfolder named Supplementary_Data_and_Functions
+
+% Load our generated data-driven map
+data_driven_image = load_nii('depression_correlation_map.nii');
+dd_voxels = reshape(data_driven_image.img, [total_voxels 1]);
+data_driven_map_masked = apply_mask(dd_voxels, template_mask, 'remove');  % template mask can be mni_mask.mat provided in the subfolder named Supplementary_Data_and_Functions
+
+% Calculate spatial correlation between maps
+[spatial_corr, spatial_p] = corr(...
+    reference_map_masked, ...
+    data_driven_map_masked, ...
+    'Rows', 'complete', ...  % Handle missing data
+    'Type', 'pearson');      % Metric for spatial similarity of the two maps
+
+% Display results
+fprintf('\nSpatial Correlation with Literature Map:\n');
+fprintf('Pearson r = %.3f, p = %.4f\n\n', spatial_corr, spatial_p);

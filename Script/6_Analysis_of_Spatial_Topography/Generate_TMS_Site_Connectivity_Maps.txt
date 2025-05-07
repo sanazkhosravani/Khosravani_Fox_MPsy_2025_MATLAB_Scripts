@@ -1,0 +1,108 @@
+% ========================================================================
+% SINGLE-SUBJECT FUNCTIONAL CONNECTIVITY MAPPING FOR TMS SITES
+% 
+% Prepared by: Sanaz Khosravani, PhD
+% Last updated: May 2025
+%
+% Purpose:
+%   This function computes single-subject functional connectivity maps
+%   between a specified TMS site and the rest of the brain using resting-state
+%   fMRI data. The normative connectivity maps (which have been used in the manuscript) are averaged maps across
+%   1000 healthy individuals.
+%
+% Processing Pipeline:
+%   1. Load resting-state fMRI data
+%   2. Extract timeseries from TMS site using spherical model
+%   3. Compute voxel-wise correlation between TMS site and whole brain
+%   4. Apply Fisher Z-transform to correlation values
+%
+% Outputs:
+%   - Fisher Z-transformed functional connectivity maps for each subject
+%
+% ========================================================================
+
+%% INITIALIZATION AND DATA LOADING
+% ------------------------------------------------------------------------
+% Section 1.1: Setup and Data Preparation
+% Purpose: Initialize environment and load necessary files
+% ------------------------------------------------------------------------
+
+clear all
+close all
+
+% Set working directory to main project folder
+cd("Set_Path_to_Main_Folder")
+
+% Define subject IDs to process
+SUBJ_Inclusive = [subject_IDs];
+SUBJ = SUBJ_Inclusive;
+
+% Load MNI brain mask for voxel selection
+load("mni_mask.mat")
+
+% Get total number of subjects to process
+number_of_subjects = size(SUBJ,2);
+
+% Pre-allocate connectivity matrix
+TMS_Site_Connectivity_Map = zeros(number_of_subjects, size(mni_mask,1));
+
+%% FUNCTIONAL CONNECTIVITY CALCULATION
+% ------------------------------------------------------------------------
+% Section 2.1: Timeseries Extraction and Correlation
+% Purpose: Compute ROI-to-whole brain functional connectivity
+% ------------------------------------------------------------------------
+
+for i = 1:number_of_subjects
+    
+    % Get current subject ID
+    ID = SUBJ(i);
+    fprintf('Processing subject %d/%d (ID: %d)\n', i, number_of_subjects, ID);
+    
+    % Load subject's resting-state fMRI data
+    timecourse = sprintf('%d_Resting_State_fMRI_Data.nii.gz',ID);
+    V_all = load_nii(timecourse);
+    
+    % Reshape 4D fMRI data to 2D matrix (voxels × time)
+    s = size(V_all.img,4);
+    V_mid = reshape(V_all.img,[902629 s]);
+    
+    % Apply MNI mask to select brain voxels
+    V = mask_4dfpimg(V_mid,mni_mask,'remove'); 
+    tc = V; % Define timeseries data for correlation
+
+    % Clear variables from previous iteration
+    clear mask seed
+    
+    % Load TMS site model (spherical field decay)
+    TMS_timeseries = 'Example_TMS_Field_Decay_Spherical_Model.nii.gz'; % Removed ID if same for all
+    mask = load_nii(TMS_timeseries);
+    
+    % Reshape TMS site map and apply MNI mask
+    all_voxels_TMS_timeseries = reshape(mask.img, [902629], 1);
+    TMS_cells = mask_4dfpimg(all_voxels_TMS_timeseries,mni_mask,'remove');
+    seed = TMS_cells;
+    ROI_TMS_Site = single(seed);
+    
+    % Identify and remove zero values (convert to NaN)
+    ind_zero = find(ROI_TMS_Site==0);
+    ROI_TMS_Site(ind_zero) = NaN;
+    
+    % Create weighted timeseries by multiplying ROI mask with fMRI data
+    tc_weighted_ROI_TMS_Site = tc .* ROI_TMS_Site;
+    
+    % Compute average timeseries across TMS site voxels
+    Averaged_Timeseries_TMS_Site = nanmean(tc_weighted_ROI_TMS_Site,1);
+    
+    % Calculate voxel-wise correlation with TMS site timeseries
+    TMS_Site_Connectivity_Map(i,:) = corr(V',Averaged_Timeseries_TMS_Site',...
+        'rows','complete','type','Pearson');
+end
+
+%% POST-PROCESSING
+% ------------------------------------------------------------------------
+% Section 3.1: Correlation Normalization
+% Purpose: Apply Fisher Z-transform to correlation values
+% ------------------------------------------------------------------------
+
+% Convert correlation coefficients to Fisher Z-scores
+TMS_Site_Connectivity_Map_Fz = atanh(TMS_Site_Connectivity_Map);
