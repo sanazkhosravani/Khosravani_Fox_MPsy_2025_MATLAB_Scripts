@@ -20,18 +20,18 @@ function P_equidistant = EquidistantPoint3D(A, B, C)
 %       2. Uses the plane containing A, B, and C as a third constraint.
 %       3. Solves the resulting linear system to find the intersection point.
 
-    % --- Compute midpoints of edges AB and AC ---
+    % Compute midpoints of edges AB and AC 
     midpoint_AB = (A + B) / 2;  
     midpoint_AC = (A + C) / 2;  
 
-    % --- Compute direction vectors AB and AC ---
+    % Compute direction vectors AB and AC 
     direction_AB = B - A;  
     direction_AC = C - A;  
 
-    % --- Compute normal vector to the plane ABC ---
+    % Compute normal vector to the plane ABC 
     normal = cross(direction_AB, direction_AC);
 
-    % --- Form the system of equations ---
+    % Form the system of equations 
     % The equidistant point:
     %   1. Lies on the perpendicular bisector plane of AB:
     %       (P - midpoint_AB) · direction_AB = 0
@@ -45,7 +45,6 @@ function P_equidistant = EquidistantPoint3D(A, B, C)
          dot(midpoint_AC, direction_AC); 
          dot(normal, A)];          
 
-    % --- Solve for P_equidistant ---
     P_equidistant = (M \ b)';  
 
 end
