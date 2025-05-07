@@ -1,0 +1,37 @@
+function PlotEquidistantPoint()
+
+    A = [1, 2, 3];
+    B = [2, -1, 3];
+    C = [2, 0, 0];
+    P = EquidistantPoint3D(A, B, C);
+    
+    figure('Color', 'white', 'Position', [100, 100, 800, 600]);
+    hold on;
+    grid on;
+    axis equal;
+    view(3);
+    plot3(A(1),A(2),A(3),'ro','MarkerSize',10,'MarkerFaceColor','r');
+    plot3(B(1),B(2),B(3),'go','MarkerSize',10,'MarkerFaceColor','g');
+    plot3(C(1),C(2),C(3),'bo','MarkerSize',10,'MarkerFaceColor','b');
+    plot3([A(1),B(1)],[A(2),B(2)],[A(3),B(3)],'k-','LineWidth',1);
+    plot3([A(1),C(1)],[A(2),C(2)],[A(3),C(3)],'k-','LineWidth',1);
+    plot3([B(1),C(1)],[B(2),C(2)],[B(3),C(3)],'k-','LineWidth',1);
+    plot3(P(1),P(2),P(3),'ko','MarkerSize',12);
+    plot3([P(1),A(1)],[P(2),A(2)],[P(3),A(3)],'k--');
+    plot3([P(1),B(1)],[P(2),B(2)],[P(3),B(3)],'k--');
+    plot3([P(1),C(1)],[P(2),C(2)],[P(3),C(3)],'k--');
+    dPA=norm(P-A);
+    dPB=norm(P-B);
+    dPC=norm(P-C);
+    title(sprintf('Plot Equidistant Point\nDistances: PA = %.4f, PB = %.4f, PC = %.4f', dPA, dPB, dPC));
+    xlabel('X');
+    ylabel('Y');
+    zlabel('Z');
+    text(A(1),A(2),A(3),'A','Color','r','FontSize',12);
+    text(B(1),B(2),B(3),'B','Color','g','FontSize',12);
+    text(C(1),C(2),C(3),'C','Color','b','FontSize',12);
+    text(P(1),P(2),P(3),'Equidistant Point','Color','k','FontSize',12);
+    
+end
+
+
