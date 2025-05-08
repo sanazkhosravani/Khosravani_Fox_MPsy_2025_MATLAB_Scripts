@@ -62,7 +62,7 @@ CI_tx_wi_norm = [mean(within_data)-1.96*std(within_data)/sqrt(l1tx),...
 CI_tx_bt_norm = [mean(between_data)-1.96*std(between_data)/sqrt(l2tx),...
                 mean(between_data)+1.96*std(between_data)/sqrt(l2tx)];
 
-% p-value from unpaired t-test (please use the p-value estimated using the linear mixed effect model illustrated in: 2_Variability_Site_Markings.mlx)
+% p-value from unpaired t-test (please use the p-value estimated using the linear mixed effect model illustrated in: 4_Variability_Site_Markings.mlx)
 [~, p_tx_unpaired] = ttest2(within_data, between_data);
 
 
